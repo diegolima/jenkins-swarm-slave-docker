@@ -1,21 +1,21 @@
-FROM openjdk:8u102-jdk
+FROM diegolima/jenkins-swarm-slave:3.9
 
-MAINTAINER Carlos Sanchez <carlos@apache.org>
+MAINTAINER Diego Lima <diego@diegolima.org>
 
-ENV JENKINS_SWARM_VERSION 3.9
-ENV HOME /home/jenkins-slave
+USER root
+RUN export CLOUD_SDK_REPO="cloud-sdk-$(grep VERSION= /etc/os-release|sed 's/.*(\(.*\)).*/\1/')" \
+      && echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+      && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-# install netstat to allow connection health check with
-# netstat -tan | grep ESTABLISHED
-RUN apt-get update && apt-get install -y net-tools && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y \
+      awscli \
+      google-cloud-sdk \
+      unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -c "Jenkins Slave user" -d $HOME -m jenkins-slave
-RUN curl --create-dirs -sSLo /usr/share/jenkins/swarm-client-$JENKINS_SWARM_VERSION.jar https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/$JENKINS_SWARM_VERSION/swarm-client-$JENKINS_SWARM_VERSION.jar \
-  && chmod 755 /usr/share/jenkins
-
-COPY jenkins-slave.sh /usr/local/bin/jenkins-slave.sh
+RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip \
+    && unzip -od /usr/bin /tmp/terraform.zip \
+    && rm -f /tmp/terraform.zip
 
 USER jenkins-slave
-VOLUME /home/jenkins-slave
-
-ENTRYPOINT ["/usr/local/bin/jenkins-slave.sh"]
