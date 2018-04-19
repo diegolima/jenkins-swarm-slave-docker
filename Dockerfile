@@ -33,5 +33,3 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
     && apt-get update \
     && apt-get install -y docker-ce \
     && rm -rf /var/lib/apt/lists/*
-
-USER jenkins-slave
