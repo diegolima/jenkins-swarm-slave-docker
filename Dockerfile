@@ -28,4 +28,10 @@ RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.11.7/t
     && unzip -od /usr/bin /tmp/terraform.zip \
     && rm -f /tmp/terraform.zip
 
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && echo "deb [arch=amd64] https://download.docker.com/linux/debian $(grep VERSION= /etc/os-release|sed 's/.*(\(.*\)).*/\1/') stable" | tee /etc/apt/sources.list.d/docker-ce.list \
+    && apt-get update \
+    && apt-get install -y docker-ce \
+    && rm -rf /var/lib/apt/lists/*
+
 USER jenkins-slave
