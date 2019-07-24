@@ -1,4 +1,4 @@
-FROM diegolima/jenkins-swarm-slave:3.9
+FROM diegolima/jenkins-swarm-slave:3.15
 
 MAINTAINER Diego Lima <diego@diegolima.org>
 
@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y apt-transport-https && rm -rf /var/lib/
 RUN export AZ_REPO="$(grep VERSION= /etc/os-release|sed 's/.*(\(.*\)).*/\1/')" \
       && echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee -a /etc/apt/sources.list.d/azure-cli.list
 
-RUN apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893 \
+RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
+    gpg --dearmor | \
+    tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null \
     && apt-get update \
     && apt-get install -y \
       azure-cli \
@@ -22,9 +24,9 @@ RUN apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979
       unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip && pip install awscli
+RUN pip install awscli
 
-RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip \
+RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip \
     && unzip -od /usr/bin /tmp/terraform.zip \
     && rm -f /tmp/terraform.zip
 
