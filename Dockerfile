@@ -26,7 +26,7 @@ RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | \
 
 RUN pip install awscli
 
-RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip \
+RUN curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.5/terraform_0.12.5_linux_amd64.zip \
     && unzip -od /usr/bin /tmp/terraform.zip \
     && rm -f /tmp/terraform.zip
 
